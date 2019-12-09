@@ -34,8 +34,10 @@ class Settings_Action {
 
 		add_action( 'admin_post_wps_update_general_settings', array( $this, 'callback_update_general_settings' ) );
 		add_action( 'admin_post_wps_update_pages_settings', array( $this, 'callback_update_pages_settings' ) );
-		add_action( 'admin_post_wps_update_email', array( $this, 'callback_update_email' ) );
+		add_action( 'admin_post_wps_update_method_payment', array( $this, 'callback_update_method_payment' ) );
 		add_action( 'admin_post_wps_update_shipping_cost', array( $this, 'callback_update_shipping_cost' ) );
+
+		add_action( 'wp_ajax_wps_hide_notice_erp', array( $this, 'dismiss_notice_erp' ) );
 
 		add_action( 'init', array( $this, 'callback_add_product_thumbnail_size' ) );
 	}
@@ -57,9 +59,10 @@ class Settings_Action {
 	public function notice_activate_erp() {
 		$dolibarr_option = get_option( 'wps_dolibarr', Settings::g()->default_settings );
 
-		if ( ! empty( $dolibarr_option['error'] ) ) {
+		if ( ! empty( $dolibarr_option['error'] ) && $dolibarr_option['notice'] && $dolibarr_option['notice']['error_erp'] ) {
 			\eoxia\View_Util::exec( 'wpshop', 'settings', 'notice-error-erp', array( 'error' => $dolibarr_option['error'] ) );
-		} elseif ( empty( $dolibarr_option['dolibarr_url'] ) || empty( $dolibarr_option['dolibarr_secret'] ) ) {
+		} elseif ( ( empty( $dolibarr_option['dolibarr_url'] ) || empty( $dolibarr_option['dolibarr_secret'] ) ) &&
+			( $dolibarr_option['notice'] && $dolibarr_option['notice']['activate_erp'] ) ) {
 			\eoxia\View_Util::exec( 'wpshop', 'settings', 'notice-activate-erp' );
 		}
 
@@ -123,6 +126,7 @@ class Settings_Action {
 		$thumbnail_size           = ! empty( $_POST['thumbnail_size'] ) ? (array) $_POST['thumbnail_size'] : array();
 		$thumbnail_size['width']  = ! empty( $thumbnail_size['width'] ) ? (int) $thumbnail_size['width'] : 0;
 		$thumbnail_size['height'] = ! empty( $thumbnail_size['height'] ) ? (int) $thumbnail_size['height'] : 0;
+		$use_quotation            = isset( $_POST['use_quotation'] ) && 'on' == $_POST['use_quotation'] ? true : false;
 
 		$dolibarr_option = get_option( 'wps_dolibarr', Settings::g()->default_settings );
 
@@ -132,6 +136,8 @@ class Settings_Action {
 
 		$dolibarr_option['thumbnail_size']['width']  = $thumbnail_size['width'];
 		$dolibarr_option['thumbnail_size']['height'] = $thumbnail_size['height'];
+
+		$dolibarr_option['use_quotation'] = $use_quotation;
 
 		update_option( 'wps_dolibarr', $dolibarr_option );
 
@@ -166,7 +172,6 @@ class Settings_Action {
 		$wps_page_cart_id                    = ! empty( $_POST['wps_page_cart_id'] ) ? (int) $_POST['wps_page_cart_id'] : 0;
 		$wps_page_checkout_id                = ! empty( $_POST['wps_page_checkout_id'] ) ? (int) $_POST['wps_page_checkout_id'] : 0;
 		$wps_page_my_account_id              = ! empty( $_POST['wps_page_my_account_id'] ) ? (int) $_POST['wps_page_my_account_id'] : 0;
-		$wps_page_valid_page_id              = ! empty( $_POST['wps_page_valid_page_id'] ) ? (int) $_POST['wps_page_valid_page_id'] : 0;
 		$wps_page_general_conditions_of_sale = ! empty( $_POST['wps_page_general_conditions_of_sale'] ) ? (int) $_POST['wps_page_general_conditions_of_sale'] : 0;
 
 		$page_ids_options = get_option( 'wps_page_ids', Pages::g()->default_options );
@@ -177,7 +182,6 @@ class Settings_Action {
 		$page_ids_options['cart_id']                    = $wps_page_cart_id;
 		$page_ids_options['checkout_id']                = $wps_page_checkout_id;
 		$page_ids_options['my_account_id']              = $wps_page_my_account_id;
-		$page_ids_options['valid_page_id']              = $wps_page_valid_page_id;
 		$page_ids_options['general_conditions_of_sale'] = $wps_page_general_conditions_of_sale;
 
 		update_option( 'wps_page_ids', $page_ids_options );
@@ -185,6 +189,38 @@ class Settings_Action {
 		set_transient( 'updated_wpshop_option_' . get_current_user_id(), __( 'Your settings have been saved.', 'wpshop' ), 30 );
 
 		wp_redirect( admin_url( 'admin.php?page=wps-settings&tab= ' . $tab ) );
+	}
+
+	/**
+	 * Met à jour les données pour la méthode de paiement "Payer en boutique".
+	 *
+	 * @since 2.0.0
+	 */
+	public function callback_update_method_payment() {
+		check_admin_referer( 'wps_update_method_payment' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die();
+		}
+
+		$title       = ! empty( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : '';
+		$type        = ! empty( $_POST['type'] ) ? sanitize_text_field( $_POST['type'] ) : '';
+		$active      = ( ! empty( $_POST['activate'] ) && 'true' == $_POST['activate'] ) ? true : false;
+		$description = ! empty( $_POST['description'] ) ? stripslashes( $_POST['description'] ) : '';
+
+		$payment_methods_option = get_option( 'wps_payment_methods', Payment::g()->default_options );
+
+		$payment_methods_option[ $type ]['title']       = $title;
+		$payment_methods_option[ $type ]['description'] = $description;
+		$payment_methods_option[ $type ]['active']      = $active;
+
+		$payment_methods_option = apply_filters( 'wps_update_payment_method_data', $payment_methods_option, $type );
+
+		update_option( 'wps_payment_methods', $payment_methods_option );
+
+		set_transient( 'updated_wpshop_option_' . get_current_user_id(), __( 'Your settings have been saved.', 'wpshop' ), 30 );
+
+		wp_redirect( admin_url( 'admin.php?page=wps-settings&tab=payment_method&section=' . $type ) );
 	}
 
 	/**
@@ -226,6 +262,28 @@ class Settings_Action {
 		if ( ! empty( $dolibarr_option['thumbnail_size']['width'] ) && ! empty( $dolibarr_option['thumbnail_size']['height'] ) ) {
 			add_image_size( 'wps-product-thumbnail', $dolibarr_option['thumbnail_size']['width'], $dolibarr_option['thumbnail_size']['height'], true );
 		}
+	}
+
+	public function dismiss_notice_erp() {
+		check_ajax_referer( 'wps_hide_notice_erp' );
+
+		$type = ! empty( $_POST['type'] ) ? sanitize_text_field( $_POST['type'] ) : '';
+
+		if ( empty( $type ) ) {
+			wp_send_json_error();
+		}
+
+		$dolibarr_option = get_option( 'wps_dolibarr', Settings::g()->default_settings );
+
+		$dolibarr_option['notice'][ $type ] = false;
+
+		update_option( 'wps_dolibarr', $dolibarr_option );
+
+		wp_send_json_success( array(
+			'namespace'        => 'wpshop',
+			'module'           => 'settings',
+			'callback_success' => 'dismiss',
+		) );
 	}
 }
 

@@ -95,14 +95,21 @@ class Tools_Action {
 	/**
 	 * Parcours le CSV. Traite chaque ligne afin de créer un tier et son contact
 	 *
+	 * @todo: nonce
+	 * @todo: check $_FILES security
+	 *
 	 * @since 2.0.0
 	 */
 	public function import_third_party() {
 		ini_set( 'memory_limit', -1 );
 
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error();
+		}
+
 		$path_to_json  = ! empty( $_POST['path_to_json'] ) ? stripslashes( $_POST['path_to_json'] ) : '';
-		$index_element = ! empty( $_POST['index_element'] ) ? $_POST['index_element'] : 0;
-		$count_element = ! empty( $_POST['count_element'] ) ? $_POST['count_element'] : 0;
+		$index_element = ! empty( $_POST['index_element'] ) ? (int) $_POST['index_element'] : 0;
+		$count_element = ! empty( $_POST['count_element'] ) ? (int) $_POST['count_element'] : 0;
 		$end           = false;
 
 		if ( empty( $path_to_json ) ) {
@@ -178,16 +185,21 @@ class Tools_Action {
 	/**
 	 * Parcours le CSV. Traite chaque ligne afin de créer les produits.
 	 *
-	 * @since 2.0.0
+	 * @todo: nonce
+	 * @todo: check $_FILES security
 	 *
-	 * @todo: curl and save file, warning security can inject backdoor. We have to securize.
+	 * @since 2.0.0
 	 */
 	public function import_product() {
 		ini_set( 'memory_limit', -1 );
 
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error();
+		}
+
 		$path_to_json  = ! empty( $_POST['path_to_json'] ) ? stripslashes( $_POST['path_to_json'] ) : '';
-		$index_element = ! empty( $_POST['index_element'] ) ? $_POST['index_element'] : 1;
-		$count_element = ! empty( $_POST['count_element'] ) ? $_POST['count_element'] : 0;
+		$index_element = ! empty( $_POST['index_element'] ) ? (int) $_POST['index_element'] : 1;
+		$count_element = ! empty( $_POST['count_element'] ) ? (int) $_POST['count_element'] : 0;
 		$end           = false;
 
 		if ( empty( $path_to_json ) ) {

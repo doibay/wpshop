@@ -123,7 +123,7 @@ class Checkout extends \eoxia\Singleton_Util {
 		foreach ( $this->get_checkout_fields() as $fieldset_key => $fieldset ) {
 			if ( 'terms' === $fieldset_key ) {
 				if ( ! $data[ $fieldset_key ] ) {
-					$errors->add( 'terms-field', apply_filters( 'wps_checkout_terms', __( 'You need to accept <strong>the general conditions of sale</strong> and <strong>the privacy policy</strong>' ) ) );
+					$errors->add( 'terms-field', apply_filters( 'wps_checkout_terms', __( 'You need to accept <strong>the general conditions of sale</strong> and <strong>the privacy policy</strong>', 'wpshop' ) ) );
 
 					$error_field = array(
 						'required'    => true,
@@ -194,7 +194,7 @@ class Checkout extends \eoxia\Singleton_Util {
 					'namespace'        => 'wpshopFrontend',
 					'module'           => 'checkout',
 					'callback_success' => 'redirect',
-					'url'              => Pages::g()->get_valid_page_link() . '/order/' . $order->data['id'] . '/',
+					'url'              => Pages::g()->get_checkout_link() . '/received/order/' . $order->data['id'] . '/',
 				) );
 				break;
 			case 'payment_in_shop':
@@ -208,11 +208,14 @@ class Checkout extends \eoxia\Singleton_Util {
 					'namespace'        => 'wpshopFrontend',
 					'module'           => 'checkout',
 					'callback_success' => 'redirect',
-					'url'              => Pages::g()->get_valid_page_link() . '/order/' . $order->data['id'] . '/',
+					'url'              => Pages::g()->get_checkout_link() . '/received/order/' . $order->data['id'] . '/',
 				) );
 				break;
 			case 'paypal':
-				update_post_meta( $order->data['id'], 'payment_method', 'paypal' );
+				$order->data['payment_method']        = 'paypal';
+				$order->data['traitment_in_progress'] = true;
+
+				$order = Doli_Order::g()->update( $order->data );
 
 				// translators: Order: Add Stripe payment to the order 000001.
 				\eoxia\LOG_Util::log( sprintf( 'Order: Add Stripe payment to the order %s', $order->data['id'] ), 'wpshop2' );
@@ -229,7 +232,8 @@ class Checkout extends \eoxia\Singleton_Util {
 				}
 				break;
 			case 'stripe':
-				update_post_meta( $order->data['id'], 'payment_method', 'stripe' );
+				$order->data['payment_method']        = 'stripe';
+				$order->data['traitment_in_progress'] = true;
 
 				// translators: Order: Add Stripe payment to the order 000001.
 				\eoxia\LOG_Util::log( sprintf( 'Order: Add Stripe payment to the order %s', $order->data['id'] ), 'wpshop2' );

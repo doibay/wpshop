@@ -30,7 +30,6 @@ class Proposals_Model extends \eoxia\Post_Model {
 	 * @param string $req_method La méthode de la requête.
 	 */
 	public function __construct( $object, $req_method = null ) {
-
 		$this->schema['external_id'] = array(
 			'type'        => 'integer',
 			'meta_type'   => 'single',

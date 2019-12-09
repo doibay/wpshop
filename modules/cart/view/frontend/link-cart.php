@@ -16,7 +16,7 @@ namespace wpshop;
 
 defined( 'ABSPATH' ) || exit; ?>
 
-<div class="wpeo-notification notification-active notification-add-to-cart notification-blue">
+<div class="wpeo-notification notification-active notification-add-to-cart notification-blue" style="opacity: 1; background: rgba(255,255,255,1);">
 	<i class="notification-icon fas fa-info"></i>
 	<div class="notification-title">
 		<?php printf( __( 'Product "%1$s" x%2$d added to the card', 'wpshop' ), $product->data['title'], $qty ); ?>

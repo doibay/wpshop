@@ -101,7 +101,7 @@ class PayPal extends \eoxia\Singleton_Util {
 			'currency_code' => 'EUR',
 			'charset'       => 'utf-8',
 			'upload'        => 1,
-			'return'        => Pages::g()->get_valid_page_link() . '/order/' . $order->data['id'],
+			'return'        => Pages::g()->get_checkout_link() . 'received/order/' . $order->data['id'],
 			'notify_url'    => site_url( 'wp-json/wpshop/v2/wps_gateway_paypal' ),
 			'cancel_return' => '',
 			'email'         => $contact->data['email'],

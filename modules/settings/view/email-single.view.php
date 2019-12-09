@@ -45,5 +45,5 @@ defined( 'ABSPATH' ) || exit; ?>
 		<textarea name="content" cols="25" <?php echo ! $is_override ? 'readonly="readonly"' : ''; ?> rows="20" class="form-field"><?php echo $content; ?></textarea>
 	</div>
 
-	<input type="submit" class="wpeo-button button-main" value="Enregister les modifications" />
+	<input type="submit" class="wpeo-button button-main" value="<?php esc_html_e( 'Save Changes', 'wpshop' ); ?>" />
 </div>

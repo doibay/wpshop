@@ -48,13 +48,13 @@ class Doli_Proposals_Action {
 		if ( Settings::g()->dolibarr_is_active() ) {
 			$doli_proposal_id = Doli_Proposals::g()->wp_to_doli( $wp_proposal );
 
-			$doli_proposal = Request_Util::post( 'proposals/' . $doli_proposal_id . '/validate', array(
-				'notrigger' => 0,
+			$doli_proposal = Request_Util::post( 'proposals/' . (int) $doli_proposal_id . '/validate', array(
+				'notrigger' => 1,
 			) );
 
-			$doli_proposal = Request_Util::post( 'proposals/' . $doli_proposal_id . '/close', array(
+			$doli_proposal = Request_Util::post( 'proposals/' . (int) $doli_proposal_id . '/close', array(
 				'status'    => 2,
-				'notrigger' => 0,
+				'notrigger' => 1,
 			) );
 
 			Request_Util::put( 'documents/builddoc', array(
@@ -65,6 +65,14 @@ class Doli_Proposals_Action {
 			update_post_meta( $wp_proposal->data['id'], '_external_id', $doli_proposal_id );
 
 			Doli_Proposals::g()->doli_to_wp( $doli_proposal, $wp_proposal );
+
+			$wpshop_object = Request_Util::post( 'wpshop/object', array(
+				'wp_id'   => $wp_proposal->data['id'],
+				'doli_id' => $doli_proposal_id,
+				'type'    => 'propal',
+			) );
+
+			update_post_meta( $wp_proposal->data['id'], '_date_last_synchro', $wpshop_object->last_sync_date );
 
 			// translators: Create proposal on dolibarr: {json_data} and create PDF.
 			\eoxia\LOG_Util::log( sprintf( 'Create proposal on dolibarr: %s and create PDF', json_encode( $doli_proposal ) ), 'wpshop2' );
@@ -128,8 +136,11 @@ class Doli_Proposals_Action {
 	}
 
 	/**
-	 * @todo: check right nonce
-	 * @return [type] [description]
+	 * Create Order from Proposal and go to pay page.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @todo: nonce
 	 */
 	public function convert_to_order_and_pay() {
 		$id = ! empty( $_GET['proposal_id'] ) ? (int) $_GET['proposal_id'] : 0;
@@ -179,6 +190,14 @@ class Doli_Proposals_Action {
 			foreach ( $proposals as $proposal ) {
 				$doli_proposal = Request_Util::post( 'proposals/' . $proposal->data['external_id'] . '/setinvoiced' );
 				Doli_Proposals::g()->doli_to_wp( $doli_proposal, $proposal );
+
+				$wpshop_object = Request_Util::post( 'wpshop/object', array(
+					'wp_id'   => $proposal->data['id'],
+					'doli_id' => $doli_proposal->id,
+					'type'    => 'propal',
+				) );
+
+				update_post_meta( $proposal->data['id'], '_date_last_synchro', $wpshop_object->last_sync_date );
 			}
 		}
 	}

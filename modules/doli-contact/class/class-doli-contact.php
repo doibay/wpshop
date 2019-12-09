@@ -50,6 +50,7 @@ class Doli_Contact extends \eoxia\Singleton_Util {
 			), true );
 		}
 
+
 		$wp_contact->data['external_id']  = (int) $doli_contact->id;
 		$wp_contact->data['login']        = sanitize_title( $doli_contact->email );
 		$wp_contact->data['firstname']    = $doli_contact->firstname;
@@ -59,20 +60,21 @@ class Doli_Contact extends \eoxia\Singleton_Util {
 		$wp_contact->data['phone_mobile'] = $doli_contact->phone_mobile;
 		$wp_contact->data['email']        = $doli_contact->email;
 
-		if ( 0 === $wp_contact->data['id'] && false !== email_exists( $wp_contact->data['email'] ) ) {
-			\eoxia\LOG_Util::log( sprintf( 'Contact: doli_to_wp can\'t create %s email already exist', json_encode( $wp_contact->data ) ), 'wpshop2' );
-			return false;
-		}
-
 		if ( ! empty( $wp_third_party ) ) {
 			$wp_contact->data['third_party_id'] = $wp_third_party->data['id'];
 		}
 
-		if ( empty( $wp_contact->data['id'] ) ) {
-			$wp_contact->data['password'] = wp_generate_password();
-		}
-
 		if ( $save ) {
+			if ( 0 === $wp_contact->data['id'] && false !== email_exists( $wp_contact->data['email'] ) ) {
+				\eoxia\LOG_Util::log( sprintf( 'Contact: doli_to_wp can\'t create %s email already exist', json_encode( $wp_contact->data ) ), 'wpshop2' );
+				return false;
+			}
+
+
+			if ( empty( $wp_contact->data['id'] ) ) {
+				$wp_contact->data['password'] = wp_generate_password();
+			}
+
 			$contact_saved = Contact::g()->update( $wp_contact->data );
 
 			if ( is_wp_error( $contact_saved ) ) {

@@ -78,11 +78,13 @@ class Doli_Invoice_Action {
 	 */
 	public function add_meta_box() {
 		if ( isset( $_GET['id'] ) && isset( $_GET['page'] ) && 'wps-invoice' === $_GET['page'] ) {
-			$invoice = Doli_Invoice::g()->get( array( 'id' => $_GET['id'] ), true );
+			$id = ! empty( $_GET['id'] ) ? (int) $_GET['id'] : 0;
+
+			$invoice = Doli_Invoice::g()->get( array( 'id' => $id ), true );
 
 			$args_metabox = array(
 				'invoice' => $invoice,
-				'id'      => $_GET['id'],
+				'id'      => $id,
 			);
 
 			/* translators: Order details CO00010 */
@@ -108,7 +110,9 @@ class Doli_Invoice_Action {
 	 */
 	public function callback_add_menu_page() {
 		if ( isset( $_GET['id'] ) ) {
-			$invoice = Doli_Invoice::g()->get( array( 'id' => $_GET['id'] ), true );
+			$id = ! empty( $_GET['id'] ) ? (int) $_GET['id'] : 0;
+
+			$invoice = Doli_Invoice::g()->get( array( 'id' => $id ), true );
 
 			if ( ! empty( $this->metaboxes ) ) {
 				foreach ( $this->metaboxes as $key => $metabox ) {
@@ -220,7 +224,8 @@ class Doli_Invoice_Action {
 			'meta_value' => (int) $doli_invoice->id,
 		), true );
 
-		$third_party = Third_Party::g()->get( array( 'id' => $invoice->data['third_party_id'] ), true );
+		$third_party = Third_Party::g()->get( array( 'id' => $wp_invoice->data['third_party_id'] ), true );
+		$contact =     Contact::g()->get( array( 'id' => $order->data['author_id'] ), true );
 
 		$invoice_file = Request_Util::get( 'documents/download?module_part=facture&original_file=' . $wp_invoice->data['title'] . '/' . $wp_invoice->data['title'] . '.pdf' );
 		$content      = base64_decode( $invoice_file->content );

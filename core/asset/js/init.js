@@ -27,4 +27,15 @@ window.eoxiaJS.wpshop.init = function() {
 			} );
 		} );
 	}
+
+	var data = {
+		action: 'check_erp_statut',
+		_wpnonce: scriptParams.check_erp_statut_nonce
+	};
+
+	jQuery.post( ajaxurl, data, function( response ) {
+		if ( ! response.data.statut && response.data.view ) {
+			jQuery( 'body' ).append( response.data.view );
+		}
+	} );
 };

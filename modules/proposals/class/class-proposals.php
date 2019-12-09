@@ -105,7 +105,7 @@ class Proposals extends \eoxia\Post_Class {
 			$per_page = $this->limit;
 		}
 
-		$current_page = isset( $_GET['current_page'] ) ? $_GET['current_page'] : 1;
+		$current_page = isset( $_GET['current_page'] ) ? (int) $_GET['current_page'] : 1;
 
 		$s = ! empty( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : '';
 

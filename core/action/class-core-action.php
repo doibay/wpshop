@@ -40,6 +40,8 @@ class Core_Action {
 		add_action( 'wp_enqueue_scripts', array( $this, 'callback_enqueue_scripts' ), 11 );
 
 		add_action( 'admin_menu', array( $this, 'callback_admin_menu' ) );
+
+		add_action( 'wp_ajax_check_erp_statut', array( $this, 'check_erp_statut' ) );
 	}
 
 	/**
@@ -102,6 +104,13 @@ class Core_Action {
 
 		wp_enqueue_style( 'wpshop-style', PLUGIN_WPSHOP_URL . 'core/asset/css/style.css', array(), \eoxia\Config_Util::$init['wpshop']->version );
 		wp_enqueue_script( 'wpshop-backend-script', PLUGIN_WPSHOP_URL . 'core/asset/js/backend.min.js', array( 'jquery', 'jquery-form' ), \eoxia\Config_Util::$init['wpshop']->version );
+
+		$script_params = array(
+				'check_erp_statut_nonce' => wp_create_nonce( 'check_erp_statut' ),
+				'url'                    => get_option( 'siteurl' ),
+		);
+
+		wp_localize_script( 'wpshop-backend-script', 'scriptParams', $script_params );
 	}
 
 	/**
@@ -115,6 +124,13 @@ class Core_Action {
 		wp_enqueue_style( 'wpshop-style', PLUGIN_WPSHOP_URL . 'core/asset/css/style.css', array(), \eoxia\Config_Util::$init['wpshop']->version );
 		wp_enqueue_style( 'wpshop-style-frontend', PLUGIN_WPSHOP_URL . 'core/asset/css/style.frontend.min.css', array(), \eoxia\Config_Util::$init['wpshop']->version );
 		wp_enqueue_script( 'wpshop-frontend-script', PLUGIN_WPSHOP_URL . 'core/asset/js/frontend.min.js', array(), \eoxia\Config_Util::$init['wpshop']->version );
+
+		$script_params = array(
+			'check_erp_statut_nonce' => wp_create_nonce( 'check_erp_statut' ),
+			'url'                    => get_option( 'siteurl' ),
+		);
+
+		wp_localize_script( 'wpshop-frontend-script', 'scriptParams', $script_params );
 	}
 
 	/**
@@ -125,6 +141,33 @@ class Core_Action {
 	public function callback_admin_menu() {
 		add_menu_page( __( 'WPshop', 'wpshop' ), __( 'WPshop', 'wpshop' ), 'manage_options', 'wpshop', '', 'dashicons-store' );
 		add_submenu_page( 'wpshop', __( 'Dashboard', 'wpshop' ), __( 'Dashboard', 'wpshop' ), 'manage_options', 'wpshop', array( Dashboard::g(), 'callback_add_menu_page' ) );
+	}
+
+	public function check_erp_statut() {
+		check_ajax_referer( 'check_erp_statut' );
+
+		$statut          = false;
+		$dolibarr_option = get_option( 'wps_dolibarr', Settings::g()->default_settings );
+
+		if ( empty( $dolibarr_option['dolibarr_url'] ) || empty( $dolibarr_option['dolibarr_secret'] ) ) {
+			wp_send_json_success( array(
+				'connected' => false,
+			) );
+		}
+
+		$response = Request_Util::get( 'status' );
+
+		if ( ! empty( $response ) && 200 === $response->success->code ) {
+			$statut = true;
+		}
+
+		ob_start();
+		require_once( PLUGIN_WPSHOP_PATH . '/core/view/erp-connexion-error.view.php' );
+		wp_send_json_success( array(
+			'connected' => true,
+			'statut'    => $statut,
+			'view'      => ob_get_clean(),
+		) );
 	}
 }
 

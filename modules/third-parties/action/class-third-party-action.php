@@ -40,13 +40,6 @@ class Third_Party_Action {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'callback_admin_menu' ), 11 );
 
-		add_action( 'wp_ajax_third_party_load_title_edit', array( $this, 'load_title_edit' ) );
-		add_action( 'admin_post_third_party_save_title', array( $this, 'save_third' ) );
-		add_action( 'wp_ajax_third_party_save_title', array( $this, 'save_third' ) );
-
-		add_action( 'wp_ajax_third_party_load_address', array( $this, 'load_billing_address' ) );
-		add_action( 'wp_ajax_third_party_save_address', array( $this, 'save_billing_address' ) );
-
 		$this->metaboxes = apply_filters( 'wps_third_party_metaboxes', array(
 			'wps-third-party-billing'  => array(
 				'callback' => 'metabox_billing_address',
@@ -87,10 +80,11 @@ class Third_Party_Action {
 	 */
 	public function callback_add_menu_page() {
 		if ( isset( $_GET['id'] ) ) {
-			$third_party  = Third_Party::g()->get( array( 'id' => $_GET['id'] ), true );
+			$id = ! empty( $_GET['id'] ) ? (int) $_GET['id'] : 0;
+			$third_party  = Third_Party::g()->get( array( 'id' => $id ), true );
 			$args_metabox = array(
 				'third_party' => $third_party,
-				'id'          => $_GET['id'],
+				'id'          => $id,
 			);
 
 			if ( ! empty( $this->metaboxes ) ) {
@@ -111,7 +105,7 @@ class Third_Party_Action {
 			$count = Third_Party::g()->search( $s, array(), true );
 
 			$number_page  = ceil( $count / $per_page );
-			$current_page = isset( $_GET['current_page'] ) ? $_GET['current_page'] : 1;
+			$current_page = isset( $_GET['current_page'] ) ? (int) $_GET['current_page'] : 1;
 
 			$base_url = admin_url( 'admin.php?page=wps-third-party' );
 
@@ -121,11 +115,11 @@ class Third_Party_Action {
 			$prev_url = $base_url . '&current_page=' . ( $current_page - 1 );
 			$next_url = $base_url . '&current_page=' . ( $current_page + 1 );
 
-			if ( ! empty( $_GET['s'] ) ) {
-				$begin_url .= '&s=' . $_GET['s'];
-				$end_url   .= '&s=' . $_GET['s'];
-				$prev_url  .= '&s=' . $_GET['s'];
-				$next_url  .= '&s=' . $_GET['s'];
+			if ( ! empty( $s ) ) {
+				$begin_url .= '&s=' . $s;
+				$end_url   .= '&s=' . $s;
+				$prev_url  .= '&s=' . $s;
+				$next_url  .= '&s=' . $s;
 			}
 
 			\eoxia\View_Util::exec( 'wpshop', 'third-parties', 'main', array(
@@ -136,6 +130,7 @@ class Third_Party_Action {
 				'end_url'      => $end_url,
 				'prev_url'     => $prev_url,
 				'next_url'     => $next_url,
+				's'            => $s,
 			) );
 		}
 	}
@@ -304,150 +299,6 @@ class Third_Party_Action {
 
 		\eoxia\View_Util::exec( 'wpshop', 'third-parties', 'metaboxes/metabox-activity', array(
 			'post' => $post,
-		) );
-	}
-
-	/**
-	 * Renvoies la vue d'édition d'un titre.
-	 *
-	 * @since 2.0.0
-	 */
-	public function load_title_edit() {
-		check_ajax_referer( 'load_title_edit' );
-
-		$post_id = isset( $_POST['post_id'] ) ? (int) $_POST['post_id'] : -1;
-
-		if ( -1 === $post_id ) {
-			exit;
-		}
-
-		$third_party = Third_Party::g()->get( array( 'id' => $post_id ), true );
-
-		ob_start();
-		\eoxia\View_Util::exec( 'wpshop', 'third-parties', 'single-title-edit', array(
-			'third_party' => $third_party,
-		) );
-		wp_send_json_success( array(
-			'namespace'        => 'wpshop',
-			'module'           => 'thirdParties',
-			'callback_success' => 'loaddedTitleEdit',
-			'view'             => ob_get_clean(),
-		) );
-	}
-
-	/**
-	 * Enregistres le titre du tier.
-	 *
-	 * @since 2.0.0
-	 */
-	public function save_third() {
-		check_ajax_referer( 'save_third' );
-
-		$post_id = isset( $_POST['post_id'] ) ? (int) $_POST['post_id'] : -1;
-		$title   = ! empty( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : '';
-
-		if ( -1 === $post_id ) {
-			exit;
-		}
-
-		$third_party = Third_Party::g()->get( array( 'id' => $post_id ), true );
-
-		$third_party->data['id'] = $post_id;
-
-		if ( empty( $post_id ) ) {
-			$third_party->data['status'] = 'publish';
-		}
-		$third_party->data['title'] = $title;
-
-		$third_party = Third_Party::g()->update( $third_party->data );
-
-		$external_id = do_action( 'wps_saved_third_party', $third_party->data );
-
-		$third_party->data['external_id'] = $external_id;
-		$third_party                      = Third_Party::g()->update( $third_party->data );
-
-		if ( wp_doing_ajax() ) {
-			ob_start();
-			\eoxia\View_Util::exec( 'wpshop', 'third-parties', 'single-title', array(
-				'third_party' => $third_party,
-			) );
-			wp_send_json_success( array(
-				'namespace'        => 'wpshop',
-				'module'           => 'thirdParties',
-				'callback_success' => 'savedThird',
-				'view'             => ob_get_clean(),
-			) );
-		} else {
-			wp_redirect( admin_url( 'admin.php?page=wps-third-party&id=' . $third_party->data['id'] ) );
-			exit;
-		}
-	}
-
-	/**
-	 * Charges la vue pour éditer l'adresse du tier.
-	 *
-	 * @since 2.0.0
-	 */
-	public function load_billing_address() {
-		check_ajax_referer( 'load_billing_address' );
-
-		$third_party_id = ! empty( $_POST['third_party_id'] ) ? (int) $_POST['third_party_id'] : 0;
-
-		if ( empty( $third_party_id ) ) {
-			wp_send_json_error();
-		}
-
-		$third_party = Third_Party::g()->get( array( 'id' => $third_party_id ), true );
-
-		ob_start();
-		\eoxia\View_Util::exec( 'wpshop', 'third-parties', 'metaboxes/metabox-billing-address-edit', array(
-			'third_party' => $third_party,
-		) );
-		wp_send_json_success( array(
-			'namespace'        => 'wpshop',
-			'module'           => 'thirdParties',
-			'callback_success' => 'loaddedBillingAddressSuccess',
-			'view'             => ob_get_clean(),
-		) );
-	}
-
-	/**
-	 * Met à jour l'adresse du tier
-	 *
-	 * @todo: Merger avec save third
-	 * @since 2.0.0
-	 */
-	public function save_billing_address() {
-		check_ajax_referer( 'save_billing_address' );
-
-		$third_party_id   = ! empty( $_POST['third_party_id'] ) ? (int) $_POST['third_party_id'] : 0;
-		$third_party_form = ! empty( $_POST['third_party'] ) ? (array) $_POST['third_party'] : array();
-
-		if ( empty( $third_party_id ) ) {
-			wp_send_json_error();
-		}
-
-		$third_party = Third_Party::g()->get( array( 'id' => $third_party_id ), true );
-
-		$third_party->data['title']   = $third_party_form['title'];
-		$third_party->data['address'] = $third_party_form['address'];
-		$third_party->data['zip']     = $third_party_form['zip'];
-		$third_party->data['town']    = $third_party_form['town'];
-		$third_party->data['phone']   = $third_party_form['phone'];
-
-		$third_party = Third_Party::g()->update( $third_party->data );
-
-		do_action( 'wps_saved_billing_address', $third_party );
-
-		ob_start();
-		\eoxia\View_Util::exec( 'wpshop', 'third-parties', 'metaboxes/metabox-billing-address', array(
-			'third_party' => $third_party,
-		) );
-		wp_send_json_success( array(
-			'namespace'        => 'wpshop',
-			'module'           => 'thirdParties',
-			'callback_success' => 'savedBillingAddressSuccess',
-			'view'             => ob_get_clean(),
 		) );
 	}
 }

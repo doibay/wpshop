@@ -36,69 +36,72 @@ defined( 'ABSPATH' ) || exit; ?>
 		?>
 	</h2>
 
-	<form method="GET" action="<?php echo admin_url( 'admin.php' ); ?>" class="wps-filter-bar wpeo-form form-light">
-		<div class="form-element">
-			<label class="form-field-container">
-				<span class="form-field-icon-prev"><i class="fas fa-search"></i></span>
-				<input type="hidden" name="page" value="wps-proposal" />
-				<input type="text" name="s" class="form-field" value="<?php echo esc_attr( ! empty( $_GET['s'] ) ? $_GET['s'] : '' ); ?>" />
-			</label>
-		</div>
+	<div class="wpeo-gridlayout wpeo-form form-light grid-4 alignleft" style="margin-bottom: 20px; margin-top: 15px;">
+		<form method="GET" action="<?php echo admin_url( 'admin.php' ); ?>" class="wps-filter-bar wpeo-form form-light" style="display: flex;">
+			<div class="form-element">
+				<label class="form-field-container">
+					<span class="form-field-icon-prev"><i class="fas fa-search"></i></span>
+					<input type="hidden" name="page" value="wps-proposal" />
+					<input type="text" name="s" class="form-field" value="<?php echo esc_attr( $s ); ?>" />
+				</label>
+			</div>
 
-		<input type="submit" class="wpeo-button button-main button-filter" value="<?php esc_html_e( 'Search', 'wpshop' ); ?>" />
+			<input type="submit" class="wpeo-button button-grey button-filter" value="<?php esc_html_e( 'Search', 'wpshop' ); ?>" />
 
-		<div></div>
-		<div></div>
-		<div class="alignright"><?php echo $count . ' éléments'; ?></div>
-	</form>
+		</form>
+	</div>
 
 	<?php
-	if ( ! empty( $_GET['s'] ) ) :
+	if ( ! empty( $s ) ) :
 		?>
-		<p>Résultats de recherche pour « <?php echo $_GET['s']; ?> »</p>
+		<p>Résultats de recherche pour « <?php echo $s; ?> »</p>
 		<?php
 	endif;
 	?>
 
-	<?php if ( $number_page > 1 ) : ?>
-		<ul class="wpeo-pagination">
-			<?php
-			if ( 1 !== $current_page ) :
-				?>
-				<li class="pagination-element pagination-prev">
-					<a href="<?php echo esc_attr( $begin_url ); ?>"><<</a>
-				</li>
+	<div class="alignright" style="display: flex; margin-top: 35px;">
+		<p style="line-height: 0px; margin-right: 5px;"><?php echo $count . ' ' . __( 'element(s)', 'wpshop' ); ?></p>
 
-				<li class="pagination-element pagination-prev">
-					<a href="<?php echo esc_attr( $prev_url ); ?>"><</a>
-				</li>
+		<?php if ( $number_page > 1 ) : ?>
+			<ul class="wpeo-pagination">
 				<?php
-			endif;
-			?>
+				if ( 1 !== $current_page ) :
+					?>
+					<li class="pagination-element pagination-prev">
+						<a href="<?php echo esc_attr( $begin_url ); ?>"><<</a>
+					</li>
 
-			<form method="GET" action="<?php echo admin_url( 'admin.php' ); ?>" />
-				<input type="hidden" name="page" value="wps-proposal" />
-				<input type="hidden" name="s" value="<?php echo esc_attr( ! empty( $_GET['s'] ) ? $_GET['s'] : '' ); ?>" />
-				<input style="width: 50px;" type="text" name="current_page" value="<?php echo esc_attr( $current_page ); ?>" />
-			</form>
-
-			sur <?php echo $number_page; ?>
-
-			<?php
-			if ( $current_page !== $number_page ) :
+					<li class="pagination-element pagination-prev">
+						<a href="<?php echo esc_attr( $prev_url ); ?>"><</a>
+					</li>
+					<?php
+				endif;
 				?>
-				<li class="pagination-element pagination-next">
-					<a href="<?php echo esc_attr( $next_url ); ?>">></a>
-				</li>
 
-				<li class="pagination-element pagination-next">
-					<a href="<?php echo esc_attr( $end_url ); ?>">>></a>
-				</li>
+				<form method="GET" action="<?php echo admin_url( 'admin.php' ); ?>" />
+					<input type="hidden" name="page" value="wps-proposal" />
+					<input type="hidden" name="s" value="<?php echo esc_attr( $s ); ?>" />
+					<input style="width: 50px;" type="text" name="current_page" value="<?php echo esc_attr( $current_page ); ?>" />
+				</form>
+
+				sur <?php echo $number_page; ?>
+
 				<?php
-			endif;
-			?>
-		</ul>
-	<?php endif; ?>
+				if ( $current_page !== $number_page ) :
+					?>
+					<li class="pagination-element pagination-next">
+						<a href="<?php echo esc_attr( $next_url ); ?>">></a>
+					</li>
+
+					<li class="pagination-element pagination-next">
+						<a href="<?php echo esc_attr( $end_url ); ?>">>></a>
+					</li>
+					<?php
+				endif;
+				?>
+			</ul>
+		<?php endif; ?>
+	</div>
 
 	<?php Proposals::g()->display(); ?>
 </div>

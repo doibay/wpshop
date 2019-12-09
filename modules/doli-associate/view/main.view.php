@@ -16,11 +16,23 @@ namespace wpshop;
 
 defined( 'ABSPATH' ) || exit; ?>
 
-<p>Ce <?php echo esc_html( $label ); ?> n'est pas associé à un <?php echo esc_html( $label ); ?> de dolibarr.</p>
+<p>
+	<?php
+	printf( __( 'This %s is not associated to a %s in Dolibarr', 'wpshop' ), esc_html( $label ), esc_html( $label ) );
+	?>
+</p>
 
-<p>Veuillez choisir le <?php echo esc_html( $label ); ?> à associer dans les éléments suivant:</p>
+<p>
+	<?php
+	printf( __( 'Please select a %s to associate in the next elements:', 'wpshop' ), esc_html( $label ) );
+	?>
+</p>
 
-<p><?php echo ucfirst( esc_html( $label ) ); ?> de votre ERP</p>
+<p>
+	<?php
+	printf( __( '%s avaibles in your ERP', 'wpshop' ), ucfirst( esc_html( $label ) ) );
+	?>
+</p>
 
 <input type="hidden" name="entry_id" />
 <input type="hidden" name="wp_id" value="<?php echo $wp_id; ?>" />

@@ -10,8 +10,6 @@
  * @package   WPshop\Templates
  *
  * @since     2.0.0
- *
- * @todo clean
  */
 
 namespace wpshop;
@@ -21,6 +19,6 @@ defined( 'ABSPATH' ) || exit; ?>
 <div class="checkout-login hide">
 	<div class="checkout-login-toggle"><?php esc_html_e( 'Returning customer ?', 'wpshop' ); ?> <span><?php esc_html_e( 'Click here to login', 'wpshop' ); ?></span></div>
 	<div class="content-login" style="display: none;">
-		<?php include( \wpshop\Template_Util::get_template_part( 'my-account', 'form-login' ) ); ?>
+		<?php My_Account::g()->display_form_login(); ?>
 	</div>
 </div>

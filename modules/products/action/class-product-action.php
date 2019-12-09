@@ -68,7 +68,7 @@ class Product_Action {
 		$count = Product::g()->search( $s, array(), true );
 
 		$number_page  = ceil( $count / $per_page );
-		$current_page = isset( $_GET['current_page'] ) ? $_GET['current_page'] : 1;
+		$current_page = isset( $_GET['current_page'] ) ? (int) $_GET['current_page'] : 1;
 
 		$base_url = admin_url( 'admin.php?page=wps-product' );
 
@@ -78,11 +78,11 @@ class Product_Action {
 		$prev_url = $base_url . '&current_page=' . ( $current_page - 1 );
 		$next_url = $base_url . '&current_page=' . ( $current_page + 1 );
 
-		if ( ! empty( $_GET['s'] ) ) {
-			$begin_url .= '&s=' . $_GET['s'];
-			$end_url   .= '&s=' . $_GET['s'];
-			$prev_url  .= '&s=' . $_GET['s'];
-			$next_url  .= '&s=' . $_GET['s'];
+		if ( ! empty( $s ) ) {
+			$begin_url .= '&s=' . $s;
+			$end_url   .= '&s=' . $s;
+			$prev_url  .= '&s=' . $s;
+			$next_url  .= '&s=' . $s;
 		}
 
 		\eoxia\View_Util::exec( 'wpshop', 'products', 'main', array(
@@ -93,6 +93,7 @@ class Product_Action {
 			'end_url'      => $end_url,
 			'prev_url'     => $prev_url,
 			'next_url'     => $next_url,
+			's'            => $s,
 		) );
 	}
 
@@ -157,12 +158,14 @@ class Product_Action {
 		update_post_meta( $post_id, '_product_downloadable', $product_data['product_downloadable'] );
 
 		if ( 'quick_save' !== $action ) {
-			update_post_meta( $post_id, '_similar_products_id', json_encode( $product_data['similar_products_id'] ) );
+			update_post_meta( $post_id, '_similar_products_id', ! empty( $product_data['similar_products_id'] ) ? json_encode( $product_data['similar_products_id'] ) : null );
 		}
 	}
 
 	/**
 	 * Change le mode d'affichage. Soit mode "vue" soit mode "edit."
+	 *
+	 * @todo: nonce
 	 *
 	 * @since 2.0.0
 	 */
@@ -197,15 +200,20 @@ class Product_Action {
 	/**
 	 * Enregistres un produit en mode édition rapide.
 	 *
+	 * @todo: nonce
+	 *
 	 * @since 2.0.0
 	 */
 	public function save_quick_save() {
+		$id    = ! empty( $_POST['id'] ) ? (int) $_POST['id'] : 0;
+		$title = ! empty( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : '';
+
 		wp_update_post( array(
-			'ID'         => $_POST['id'],
-			'post_title' => $_POST['title'],
+			'ID'         => $id,
+			'post_title' => $title,
 		) );
 
-		$product         = Product::g()->get( array( 'id' => $_POST['id'] ), true );
+		$product         = Product::g()->get( array( 'id' => $id ), true );
 		$dolibarr_option = get_option( 'wps_dolibarr', Settings::g()->default_settings );
 
 		ob_start();

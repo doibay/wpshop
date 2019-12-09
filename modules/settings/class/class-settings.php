@@ -54,6 +54,11 @@ class Settings extends \eoxia\Singleton_Util {
 				'width'  => 360,
 				'height' => 460,
 			),
+			'use_quotation' => true,
+			'notice' => array(
+				'error_erp' => true,
+				'activate_erp' => true,
+			),
 		);
 
 		$this->shipping_cost_default_settings = array(
@@ -135,13 +140,13 @@ class Settings extends \eoxia\Singleton_Util {
 	 */
 	public function display_payment_method( $section = '' ) {
 		$payment_methods = get_option( 'wps_payment_methods', Payment::g()->default_options );
+
 		if ( ! empty( $section ) ) {
-			$payment_methods = $payment_methods;
-			$payment         = $payment_methods[ $section ];
+			$payment_data = Payment::g()->get_payment_option( $section );
 
 			\eoxia\View_Util::exec( 'wpshop', 'settings', 'payment-method-single', array(
-				'section' => $section,
-				'payment' => $payment,
+				'section'      => $section,
+				'payment_data' => $payment_data,
 			) );
 		} else {
 			\eoxia\View_Util::exec( 'wpshop', 'settings', 'payment-method', array(
@@ -192,6 +197,12 @@ class Settings extends \eoxia\Singleton_Util {
 		}
 
 		return false;
+	}
+
+	public function use_quotation() {
+		$dolibarr_option = get_option( 'wps_dolibarr', Settings::g()->default_settings );
+
+		return $dolibarr_option['use_quotation'];
 	}
 }
 

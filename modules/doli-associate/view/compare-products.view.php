@@ -2,8 +2,6 @@
 /**
  * Le contenu de la modal de synchronisation.
  *
- * @todo: template pas OK
- *
  * @author    Eoxia <dev@eoxia.com>
  * @copyright (c) 2011-2019 Eoxia <dev@eoxia.com>.
  *

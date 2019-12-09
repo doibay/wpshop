@@ -2,7 +2,7 @@
 /**
  * Email reçu par l'administrateur lors d'une nouvelle commande utilisateur.
  *
- * @todo: Vérifier
+ * @todo: Faire contenu mail
  *
  * @author    Eoxia <dev@eoxia.com>
  * @copyright (c) 2011-2019 Eoxia <dev@eoxia.com>.

@@ -36,7 +36,6 @@ class Checkout_Shortcode extends \eoxia\Singleton_Util {
 	 */
 	public function callback_init() {
 		add_shortcode( 'wps_checkout', array( $this, 'callback_checkout' ) );
-		add_shortcode( 'wps_valid', array( $this, 'callback_valid' ) );
 	}
 
 	/**
@@ -70,7 +69,12 @@ class Checkout_Shortcode extends \eoxia\Singleton_Util {
 			$shipping_cost           = Cart_Session::g()->shipping_cost;
 			$direct_pay              = false;
 
-			if ( ! array_key_exists( 'id', $wp->query_vars ) ) {
+			if ( array_key_exists( 'type', $wp->query_vars ) && in_array( 'received', $wp->query_vars ) ) {
+				$this->display_valid_checkout( array(
+					'type' => $wp->query_vars['object_type'],
+					'id'   => $wp->query_vars['id'],
+				) );
+			} else if ( ! array_key_exists( 'id', $wp->query_vars ) ) {
 				include( Template_Util::get_template_part( 'checkout', 'form-checkout' ) );
 			} else {
 				$direct_pay = true;
@@ -86,7 +90,7 @@ class Checkout_Shortcode extends \eoxia\Singleton_Util {
 	 *
 	 * @since 2.0.0
 	 */
-	public function callback_valid( $atts ) {
+	public function display_valid_checkout( $atts ) {
 		if ( ! is_admin() ) {
 			$object      = null;
 			$text        = '';
@@ -101,6 +105,10 @@ class Checkout_Shortcode extends \eoxia\Singleton_Util {
 				$object      = Doli_Order::g()->get( array( 'id' => $atts['id'] ), true );
 				$title       = __( 'order', 'wpshop' );
 				$button_text = __( 'See my orders', 'wpshop' );
+			}
+
+			if ( ! is_object( $object ) || $object->data['author_id'] != get_current_user_id() ) {
+				wp_die( __( 'You can not see this page. Go back to <a href="' . home_url() . '">home!</a>', 'wpshop' ) );
 			}
 
 			if ( null !== $object ) {

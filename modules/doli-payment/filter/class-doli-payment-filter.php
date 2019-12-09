@@ -35,15 +35,13 @@ class Doli_Payment_Filter {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @todo: a vérifier.
-	 *
 	 * @param array $payment_methods Les méthodes de paiement de WP.
 	 *
 	 * @return array                 Avec l'entrée doli_type en plus.
 	 */
 	public function add_payment_details( $payment_methods ) {
 		$payment_methods['paypal']['doli_type']          = 'CB';
-		$payment_methods['stripe']['doli_type']          = 'CB';
+		$payment_methods['stripe']['doli_type']          = 'STR';
 		$payment_methods['cheque']['doli_type']          = 'CHQ';
 		$payment_methods['payment_in_shop']['doli_type'] = '';
 

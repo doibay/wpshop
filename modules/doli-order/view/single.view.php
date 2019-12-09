@@ -24,7 +24,7 @@ defined( 'ABSPATH' ) || exit; ?>
 		</h2>
 	</div>
 
-	<div class="wps-page-content wpeo-gridlayout grid-3">
+	<div class="wps-page-content wpeo-gridlayout grid-4">
 		<?php do_action( 'wps_order', $order ); ?>
 	</div>
 </div>

@@ -10,22 +10,15 @@
  * @package   WPshop\Templates
  *
  * @since     2.0.0
- *
- * @todo clean
  */
 
 namespace wpshop;
 
 defined( 'ABSPATH' ) || exit;
 
-global $post;
-
 do_action( 'wps_before_customer_login_form' ); ?>
 
 <?php
-$transient = get_transient( 'login_error_' . $_COOKIE['PHPSESSID'] );
-delete_transient( 'login_error_' . $_COOKIE['PHPSESSID'] );
-
 if ( ! empty( $transient ) ) :
 	?>
 	<div class="notice notice-error ">
@@ -38,7 +31,7 @@ endif;
 <form class="wpeo-form" action="<?php echo esc_attr( admin_url( 'admin-post.php' ) ); ?>" method="post">
 	<?php wp_nonce_field( 'handle_login' ); ?>
 	<input type="hidden" name="action" value="wps_login" />
-	<input type="hidden" name="page" value="<?php echo Pages::g()->get_slug_link_shop_page( $post->ID ); ?>" />
+	<input type="hidden" name="page" value="<?php echo Pages::g()->get_slug_shop_page(); ?>" />
 	<?php do_action( 'wps_login_form_start' ); ?>
 
 	<div class="wpeo-gridlayout grid-2 grid-margin-1">

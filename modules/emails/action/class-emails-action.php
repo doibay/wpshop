@@ -58,8 +58,6 @@ class Emails_Action {
 	 * Ajoutes les détails de la commande dans le mail
 	 * "customer-processing-order.php"
 	 *
-	 * @todo: Bien placé ?
-	 *
 	 * @since 2.0.0
 	 *
 	 * @param Order_Model $order Les données de la commande.
@@ -92,8 +90,6 @@ class Emails_Action {
 	/**
 	 * Ajoutes les informations de paiement dans le mail
 	 * "customer-processing-order.php"
-	 *
-	 * @todo: Bien placé ?
 	 *
 	 * @since 2.0.0
 	 *

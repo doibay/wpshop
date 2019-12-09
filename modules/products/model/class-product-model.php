@@ -188,6 +188,7 @@ class Product_Model extends \eoxia\Post_Model {
 			'type'      => 'array',
 			'meta_type' => 'integer',
 			'field'     => '_similar_products_id',
+			'default'   => null,
 		);
 
 		$this->schema['associated_document_id'] = array(

@@ -2,7 +2,7 @@
 /**
  * Email reçu par l'utilisateur lors d'une commande en cours.
  *
- * @todo: Vérifier
+ * @todo: Faire contenu mail
  *
  * @author    Eoxia <dev@eoxia.com>
  * @copyright (c) 2011-2019 Eoxia <dev@eoxia.com>.

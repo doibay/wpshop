@@ -40,6 +40,7 @@ class Checkout_Filter {
 	public function add_order_or_quotation_id( $vars ) {
 		$vars[] = 'id';
 		$vars[] = 'type';
+		$vars[] = 'object_type';
 
 		return $vars;
 	}

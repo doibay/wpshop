@@ -17,5 +17,5 @@ window.eoxiaJS.wpshop.doliOrder = {};
 window.eoxiaJS.wpshop.doliOrder.init = function() {};
 
 window.eoxiaJS.wpshop.doliOrder.markedAsDelivery = function ( triggeredElement, response ) {
-	jQuery( '.wps-customer-address' ).replaceWith( response.data.view );
+	jQuery( '.wps-shipment-tracking' ).replaceWith( response.data.view );
 }

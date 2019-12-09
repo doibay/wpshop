@@ -51,7 +51,7 @@ defined( 'ABSPATH' ) || exit; ?>
 								if ( ! $order->data['billed'] ) :
 									?>
 									<li>
-										<a href="<?php echo esc_attr( admin_url( 'admin-post.php?action=wps_pay_order&order_id=' . $order->data['id'] ) ); ?>"
+										<a href="<?php echo esc_attr( admin_url( 'admin-post.php?action=wps_pay_order&order_id=' . $order->data['id'] ) . '&_wpnonce=' . wp_create_nonce( 'do_pay' ) ); ?>"
 											class="dropdown-item">
 											<i class="fas fa-money-bill"></i> <?php esc_html_e( 'Pay order', 'wpshop' );
 											?>

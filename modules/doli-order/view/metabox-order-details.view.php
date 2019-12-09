@@ -27,21 +27,7 @@ defined( 'ABSPATH' ) || exit; ?>
 				<li><span><?php esc_html_e( 'Customer', 'wpshop' ); ?></span> <a href="<?php echo admin_url( 'admin.php?page=wps-third-party&id=' . $third_party->data['id'] ); ?>"><?php echo esc_html( $third_party->data['title'] ); ?></a></li>
 				<li><span><?php esc_html_e( 'Phone', 'wpshop' ); ?></span> <?php echo esc_html( $third_party->data['phone'] ); ?></li>
 				<li><span><?php esc_html_e( 'Order status', 'wpshop' ); ?></span> <?php echo Doli_Statut::g()->display_status( $order ); ?></li>
-				<li><span><?php esc_html_e( 'Payment status', 'wpshop' ); ?></span> <?php echo Payment::g()->make_readable_statut( $order ); ?></li>
-
-				<?php
-				if ( ! $order->data['delivered'] ) :
-					?>
-					<li>
-						<div class="wpeo-button button-main action-delete" data-message-delete="<?php echo esc_html_e( 'Mark as delivery ?', 'wpshop' ); ?>"
-							data-action="mark_as_delivery"
-							data-id="<?php echo esc_attr( $order->data['id'] ); ?>">
-							<span><?php esc_html_e( 'Mark as delivery', 'wpshop' ); ?></span>
-						</div>
-					</li>
-					<?php
-				endif;
-				?>
+				<li><span><?php esc_html_e( 'Payment method', 'wpshop' ); ?></span> <?php echo esc_html( Payment::g()->get_payment_title( $order->data['payment_method'] ) ); ?></li>
 			</ul>
 		</div>
 

@@ -198,11 +198,6 @@ class Doli_Sync extends \eoxia\Singleton_Util {
 					$wp_proposal   = Proposals::g()->get( array( 'id' => $wp_id ), true );
 
 					Doli_Proposals::g()->doli_to_wp( $doli_proposal, $wp_proposal );
-
-					Request_Util::post( 'wpshop/object', array(
-						'wp_id'   => $wp_id,
-						'doli_id' => $entry_id,
-					) );
 				}
 
 				$wp_object = $wp_proposal;
@@ -236,8 +231,6 @@ class Doli_Sync extends \eoxia\Singleton_Util {
 							Doli_Invoice::g()->doli_to_wp( $doli_invoice, $wp_invoice );
 						}
 					}
-
-					// Règlement.
 				}
 
 				$wp_object = $wp_order;

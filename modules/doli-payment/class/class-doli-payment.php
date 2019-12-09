@@ -80,8 +80,6 @@ class Doli_Payment extends \eoxia\Post_Class {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @todo: Gérer les status
-	 *
 	 * @param integer  $wp_invoice_id L'ID de la facture.
 	 * @param stdClass $doli_payment  Les données de dolibarr.
 	 * @param Payment  $wp_payment    Les données de WP.
@@ -101,8 +99,6 @@ class Doli_Payment extends \eoxia\Post_Class {
 	 * Convertie vers l'ID de dolibarr
 	 *
 	 * @since 2.0.0
-	 *
-	 * @todo: a vérifier
 	 *
 	 * @param array $payment_method Méthode de paiement.
 	 *

@@ -5,7 +5,6 @@
   "path": "modules/contacts",
   "dependencies": {
     "filter": {},
-    "action": {},
     "class": {},
     "model": {}
 	}

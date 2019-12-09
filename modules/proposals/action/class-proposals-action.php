@@ -68,10 +68,13 @@ class Proposals_Action {
 	 * @since 2.0.0
 	 */
 	public function callback_admin_menu() {
-		$hook = add_submenu_page( 'wpshop', __( 'Proposals', 'wpshop' ), __( 'Proposals', 'wpshop' ), 'manage_options', 'wps-proposal', array( $this, 'callback_add_menu_page' ) );
+		if ( Settings::g()->use_quotation() ) {
 
-		if ( ! isset( $_GET['id'] ) ) {
-			add_action( 'load-' . $hook, array( $this, 'callback_add_screen_option' ) );
+			$hook = add_submenu_page( 'wpshop', __( 'Proposals', 'wpshop' ), __( 'Proposals', 'wpshop' ), 'manage_options', 'wps-proposal', array( $this, 'callback_add_menu_page' ) );
+
+			if ( ! isset( $_GET['id'] ) ) {
+				add_action( 'load-' . $hook, array( $this, 'callback_add_screen_option' ) );
+			}
 		}
 	}
 
@@ -98,7 +101,8 @@ class Proposals_Action {
 	 */
 	public function callback_add_menu_page() {
 		if ( isset( $_GET['id'] ) ) {
-			$proposal    = Proposals::g()->get( array( 'id' => $_GET['id'] ), true );
+			$id = ! empty( $_GET['id'] ) ? (int) $_GET['id'] : 0;
+			$proposal    = Proposals::g()->get( array( 'id' => $id ), true );
 			$third_party = Third_Party::g()->get( array( 'id' => $proposal->data['parent_id'] ), true );
 
 			if ( ! empty( $this->metaboxes ) ) {
@@ -123,7 +127,7 @@ class Proposals_Action {
 			$count = Proposals::g()->search( $s, array(), true );
 
 			$number_page  = ceil( $count / $per_page );
-			$current_page = isset( $_GET['current_page'] ) ? $_GET['current_page'] : 1;
+			$current_page = isset( $_GET['current_page'] ) ? (int) $_GET['current_page'] : 1;
 
 			$base_url = admin_url( 'admin.php?page=wps-proposal' );
 
@@ -133,11 +137,11 @@ class Proposals_Action {
 			$prev_url = $base_url . '&current_page=' . ( $current_page - 1 );
 			$next_url = $base_url . '&current_page=' . ( $current_page + 1 );
 
-			if ( ! empty( $_GET['s'] ) ) {
-				$begin_url .= '&s=' . $_GET['s'];
-				$end_url   .= '&s=' . $_GET['s'];
-				$prev_url  .= '&s=' . $_GET['s'];
-				$next_url  .= '&s=' . $_GET['s'];
+			if ( ! empty( $s ) ) {
+				$begin_url .= '&s=' . $s;
+				$end_url   .= '&s=' . $s;
+				$prev_url  .= '&s=' . $s;
+				$next_url  .= '&s=' . $s;
 			}
 
 			\eoxia\View_Util::exec( 'wpshop', 'proposals', 'main', array(
@@ -148,6 +152,7 @@ class Proposals_Action {
 				'end_url'      => $end_url,
 				'prev_url'     => $prev_url,
 				'next_url'     => $next_url,
+				's'            => $s,
 			) );
 		}
 	}
@@ -232,15 +237,15 @@ class Proposals_Action {
 
 				$tva_lines[ $line['tva_tx'] ] += empty( $line['total_tva'] ) ? $line['tva_amount'] * $line['qty'] : $line['total_tva'];
 
-				if ( empty( $line['libelle'] ) ) {
+				if ( empty( $line['libelle'] ) && ! empty( $line['title'] ) ) {
 					$line['libelle'] = $line['title'];
 				}
 
-				if ( empty( $line['subprice'] ) ) {
+				if ( empty( $line['subprice'] ) && isset( $line['price'] ) ) {
 					$line['subprice'] = $line['price'];
 				}
 
-				if ( empty( $line['total_ht'] ) ) {
+				if ( empty( $line['total_ht'] ) && isset( $line['price'] ) ) {
 					$line['total_ht'] = $line['price'] * $line['qty'];
 				}
 			}
@@ -248,7 +253,7 @@ class Proposals_Action {
 
 		if ( Settings::g()->dolibarr_is_active() ) {
 			\eoxia\View_Util::exec( 'wpshop', 'order', 'review-order', array(
-				'proposal'  => $proposal,
+				'object'    => $proposal,
 				'tva_lines' => $tva_lines,
 			) );
 		} else {

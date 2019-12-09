@@ -364,6 +364,11 @@ class Doli_Sync_Action {
 
 				if ( 'dolibarr' === $from ) {
 					$wp_entry = Doli_Proposals::g()->doli_to_wp( $doli_entry, $wp_entry, true, $notices );
+					$wp_entry->data['tier'] = null;
+
+					if ( ! empty( $wp_entry->data['parent_id'] ) ) {
+						$wp_entry->data['tier'] = Third_Party::g()->get( array( 'id' => $wp_entry->data['parent_id'] ), true );
+					}
 				} else {
 					$wp_entry->data['external_id'] = $entry_id;
 					$wp_entry                      = Doli_Proposals::g()->wp_to_doli( $wp_entry, $doli_entry, true, $notices );
@@ -472,6 +477,10 @@ class Doli_Sync_Action {
 		}
 	}
 
+	/**
+	 * @todo: nonce
+	 * @return [type] [description]
+	 */
 	public function check_sync_statut() {
 		$id = ! empty( $_POST['id'] ) ? (int) $_POST['id'] : 0;
 

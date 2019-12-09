@@ -86,7 +86,7 @@ class Doli_Order_Filter {
 	public function add_review_order_table_class( $class, $object ) {
 		switch ( $object->data['type'] ) {
 			case Doli_Order::g()->get_type():
-				$class = 'gridw-3';
+				$class = 'gridw-4';
 				break;
 			case Doli_Invoice::g()->get_type():
 				$class = 'gridw-4';
@@ -102,6 +102,10 @@ class Doli_Order_Filter {
 
 	public function wps_doli_status( $status, $object ) {
 		if ( $object->data['type'] == Doli_Order::g()->get_type() ) {
+			if ( $object->data['traitment_in_progress'] ) {
+				return __( 'Traitment in progress', 'wpshop' );
+			}
+
 			if ( $object->data['delivered'] ) {
 				return $status . ' ' . __( '(Delivery)', 'wpshop' );
 			}

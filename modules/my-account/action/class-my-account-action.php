@@ -30,8 +30,6 @@ class My_Account_Action {
 		add_action( 'init', array( My_Account_Shortcode::g(), 'init_shortcode' ) );
 		add_action( 'init', array( My_Account::g(), 'init_endpoint' ) );
 
-		add_action( 'wps_before_customer_login_form', array( My_Account::g(), 'before_login_form' ) );
-
 		add_action( 'wps_before_checkout_form', array( My_Account::g(), 'checkout_form_login' ) );
 
 		add_action( 'admin_post_wps_login', array( $this, 'handle_login' ) );
@@ -79,9 +77,10 @@ class My_Account_Action {
 		), is_ssl() );
 
 		if ( is_wp_error( $user ) ) {
-			set_transient( 'login_error_' . $_COOKIE['PHPSESSID'], __( 'Your username or password is incorrect.', 'wpshop' ), 30 );
+			update_option( 'login_error_' . $_COOKIE['PHPSESSID'], __( 'Your username or password is incorrect.', 'wpshop' ) );
 
 			wp_redirect( $page );
+			exit;
 		} else {
 			wp_redirect( $page );
 			exit;
@@ -184,19 +183,24 @@ class My_Account_Action {
 	 * le panier.
 	 *
 	 * @since 2.0.0
-	 *
-	 * @todo: Vérifier nonce et author
 	 */
 	public function do_pay() {
+		check_admin_referer( 'do_pay' );
 		$id = ! empty( $_GET['order_id'] ) ? (int) $_GET['order_id'] : 0;
 
 		if ( empty( $id ) ) {
 			wp_send_json_error();
 		}
 
+		$order = Doli_Order::g()->get( array( 'id' => $id ), true );
+
+		if ( $order->data['author_id'] != get_current_user_id() ) {
+			wp_die( __( 'What do you try to do ?', 'wpshop' ) );
+		}
+
 		Checkout::g()->do_pay( $id );
 
-		wp_redirect( Pages::g()->get_checkout_link() . '/pay/' . $order->data['id'] );
+		wp_redirect( Pages::g()->get_checkout_link() . '/pay/' . $id );
 	}
 
 	/**

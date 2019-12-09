@@ -21,8 +21,6 @@ defined( 'ABSPATH' ) || exit; ?>
 <?php do_action( 'wps_before_checkout_billing_form' ); ?>
 
 <div class="wpeo-gridlayout grid-6">
-	<?php wp_nonce_field( 'callback_checkout_create_third' ); ?>
-
 	<div class="form-element contact-firstname gridw-3">
 		<label class="form-field-container">
 			<input type="text" class="form-field" name="contact[firstname]" placeholder="<?php esc_html_e( 'First name', 'wpshop' ); ?>" value="<?php echo ! empty( $contact->data['firstname'] ) ? $contact->data['firstname'] : ''; ?>" />

@@ -19,9 +19,12 @@ defined( 'ABSPATH' ) || exit;
 DEFINE( 'PLUGIN_WPSHOP_PATH', realpath( plugin_dir_path( __FILE__ ) ) . '/' );
 DEFINE( 'PLUGIN_WPSHOP_URL', plugins_url( basename( __DIR__ ) ) . '/' );
 DEFINE( 'PLUGIN_WPSHOP_DIR', basename( __DIR__ ) );
+DEFINE( 'PLUGIN_WPSHOP_DEV_MODE', false );
 
-// Include EO_Framework.
-require_once 'core/external/eo-framework/eo-framework.php';
+if ( ! PLUGIN_WPSHOP_DEV_MODE ) {
+	require_once 'core/external/eo-framework/eo-framework.php';
+}
+
 
 // Include composer component.
 require_once 'vendor/autoload.php';

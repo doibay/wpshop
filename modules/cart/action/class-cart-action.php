@@ -108,6 +108,8 @@ class Cart_Action {
 	/**
 	 * Action pour mêttre à jour le panier.
 	 *
+	 * @todo Validate Data in $_POST['products']
+	 *
 	 * @since 2.0.0
 	 */
 	public function ajax_update_cart() {

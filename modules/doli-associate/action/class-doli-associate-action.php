@@ -128,7 +128,6 @@ class Doli_Associate_Action {
 				$doli_to_wp_entry = Doli_Third_Parties::g()->doli_to_wp( $doli_entry, $doli_to_wp_entry, false );
 
 				$doli_to_wp_entry->data['contacts'] = Request_Util::get( 'contacts?sortfield=t.rowid&sortorder=ASC&limit=-1&thirdparty_ids=' . $doli_to_wp_entry->data['external_id'] );
-
 				if ( ! empty( $doli_to_wp_entry->data['contacts'] ) ) {
 					foreach ( $doli_to_wp_entry->data['contacts'] as &$contact ) {
 						$wp_contact = Contact::g()->get( array( 'schema' => true ), true );

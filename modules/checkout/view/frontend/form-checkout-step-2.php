@@ -18,8 +18,8 @@ defined( 'ABSPATH' ) || exit; ?>
 
 <?php do_action( 'wps_checkout_before_payment' ); ?>
 
-<form method="post" class="wps-checkout-step-2">
+<div class="wps-checkout-step-2">
 	<?php do_action( 'wps_checkout_payment' ); ?>
-</form>
+</div>
 
 <?php do_action( 'wps_checkout_after_payment' ); ?>

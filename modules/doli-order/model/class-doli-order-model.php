@@ -160,6 +160,23 @@ class Doli_Order_Model extends \eoxia\Post_Model {
 			'context'     => array( 'GET' ),
 		);
 
+		$this->schema['tracking_link'] = array(
+			'type'        => 'string',
+			'meta_type'   => 'single',
+			'field'       => '_tracking_link',
+			'since'       => '2.0.0',
+			'description' => 'URL de suivi de colis pour la livraison',
+		);
+
+		$this->schema['traitment_in_progress'] = array(
+			'type'        => 'boolean',
+			'meta_type'   => 'single',
+			'field'       => '_traitment_in_progress',
+			'default'     => false,
+			'since'       => '2.0.0',
+			'description' => 'Permet d\'afficher un status "Traiement en cours" lors de l\'attente du retour de Paypal, Stripe ou autre système de paiement.',
+		);
+
 		$this->schema['linked_objects_ids'] = array(
 			'type'      => 'array',
 			'meta_type' => 'single',

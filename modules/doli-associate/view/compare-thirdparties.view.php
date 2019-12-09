@@ -2,8 +2,6 @@
 /**
  * Le contenu de la modal de synchronisation.
  *
- * @todo: template pas OK
- *
  * @author    Eoxia <dev@eoxia.com>
  * @copyright (c) 2011-2019 Eoxia <dev@eoxia.com>.
  *
@@ -31,14 +29,14 @@ defined( 'ABSPATH' ) || exit; ?>
 
 				<ul>
 					<li><strong><?php esc_html_e( 'Tier name', 'wpshop' ); ?></strong>: <?php echo ! empty( $entry['data']['title'] ) ? esc_html( $entry['data']['title'] ) : 'Non définie'; ?></li>
-					<li><strong>Adresse</strong>: <?php echo ! empty( $entry['data']['address'] ) ? esc_html( $entry['data']['address'] ) : 'Non définie'; ?></li>
-					<li><strong>Code postal</strong>: <?php echo ! empty( $entry['data']['zip'] ) ? esc_html( $entry['data']['zip'] ) : 'Non définie'; ?></li>
-					<li><strong>Ville</strong>: <?php echo ! empty( $entry['data']['town'] ) ? esc_html( $entry['data']['town'] ) : 'Non définie'; ?></li>
-					<li><strong>Pays</strong>: <?php echo ! empty( $entry['data']['country'] ) ? esc_html( $entry['data']['country'] ) : 'Non définie'; ?></li>
-					<li><strong>Numéro de téléphone</strong>: <?php echo ! empty( $entry['data']['phone'] ) ? esc_html( $entry['data']['phone'] ) : 'Non définie'; ?></li>
+					<li><strong><?php esc_html_e( 'Address', 'wpshop' ); ?></strong>: <?php echo ! empty( $entry['data']['address'] ) ? esc_html( $entry['data']['address'] ) : 'Non définie'; ?></li>
+					<li><strong><?php esc_html_e( 'Postcode / ZIP', 'wpshop' ); ?></strong>: <?php echo ! empty( $entry['data']['zip'] ) ? esc_html( $entry['data']['zip'] ) : 'Non définie'; ?></li>
+					<li><strong><?php esc_html_e( 'Town', 'wpshop' ); ?></strong>: <?php echo ! empty( $entry['data']['town'] ) ? esc_html( $entry['data']['town'] ) : 'Non définie'; ?></li>
+					<li><strong><?php esc_html_e( 'Country', 'wpshop' ); ?></strong>: <?php echo ! empty( $entry['data']['country'] ) ? esc_html( $entry['data']['country'] ) : 'Non définie'; ?></li>
+					<li><strong><?php esc_html_e( 'Phone number', 'wpshop' ); ?></strong>: <?php echo ! empty( $entry['data']['phone'] ) ? esc_html( $entry['data']['phone'] ) : 'Non définie'; ?></li>
 				</ul>
 
-				<h3>Contacts</h3>
+				<h3><?php esc_html_e( 'Contacts', 'wpshop' ); ?></h3>
 
 				<div class="wpeo-table table-flex table-5">
 

@@ -61,32 +61,24 @@ class My_Account extends \eoxia\Singleton_Util {
 	}
 
 	/**
-	 * Ajoutes le titre de la page de login.
-	 *
-	 * @since 2.0.0
-	 *
-	 * @todo: Mal placé ? Pas trop compréhensible.
-	 */
-	public function before_login_form() {
-		global $post;
-
-		if ( Pages::g()->get_slug_link_shop_page( $post->ID ) === 'my-account' ) {
-			include( Template_Util::get_template_part( 'my-account', 'login-title' ) );
-		}
-	}
-
-	/**
 	 * Appel la vue pour afficher le formulaire de login dans la page de
 	 * paiement.
 	 *
 	 * @since 2.0.0
-	 *
-	 * @todo: Mal placé ?
 	 */
 	public function checkout_form_login() {
 		if ( ! is_user_logged_in() ) {
 			include( Template_Util::get_template_part( 'my-account', 'checkout-login' ) );
 		}
+	}
+
+	public function display_form_login() {
+		global $post;
+
+		$transient = get_option( 'login_error_' . $_COOKIE['PHPSESSID'] );
+		update_option( 'login_error_' . $_COOKIE['PHPSESSID'], '', false );
+
+		include( Template_Util::get_template_part( 'my-account', 'form-login' ) );
 	}
 
 	/**
@@ -102,11 +94,6 @@ class My_Account extends \eoxia\Singleton_Util {
 				'link'  => Pages::g()->get_account_link() . 'details/',
 				'icon'  => 'fas fa-user' ,
 				'title' => __( 'Account details', 'wpshop' ),
-			),
-			'quotations' => array(
-				'link'  => Pages::g()->get_account_link() . 'quotations/',
-				'icon'  => 'fas fa-file-signature',
-				'title' => __( 'Quotations', 'wpshop' ),
 			),
 			'logout'     => array(
 				'link'  => wp_logout_url( home_url() ),
@@ -130,7 +117,6 @@ class My_Account extends \eoxia\Singleton_Util {
 		}
 
 		$this->menu = apply_filters( 'wps_account_navigation_items', $menu_def );
-
 		include( Template_Util::get_template_part( 'my-account', 'my-account-navigation' ) );
 	}
 

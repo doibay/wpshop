@@ -2,7 +2,7 @@
 /**
  * Ajoutes les détails de la commande.
  *
- * @todo: Vérifier
+ * @todo: Faire contenu mail
  *
  * @author    Eoxia <dev@eoxia.com>
  * @copyright (c) 2011-2019 Eoxia <dev@eoxia.com>.

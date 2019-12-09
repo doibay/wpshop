@@ -44,9 +44,9 @@ window.eoxiaJS.wpshopFrontend.cart.addedToCart = function ( triggeredElement, re
 		var tmp = jQuery( response.data.view );
 		jQuery( 'body' ).append( tmp );
 
-		tmp.timeout = setTimeout(function() {
+		tmp.timeout = setTimeout( function() {
 			tmp.remove();
-		}, 2000);
+		}, 5000 );
 	}
 
 	if ( response.data.qty ) {

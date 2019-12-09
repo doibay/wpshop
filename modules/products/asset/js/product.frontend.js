@@ -15,26 +15,26 @@ window.eoxiaJS.wpshopFrontend.product.init = function() {
 };
 
 window.eoxiaJS.wpshopFrontend.product.updateQty = function( event ) {
-	if ( jQuery( '.single-wps-product .wps-product .wps-product-buy' ).length > 0 ) {
-		var qty   = parseInt( jQuery( '.single-wps-product .wps-product .wps-product-buy' ).attr( 'data-qty' ) );
-		var price = parseFloat( jQuery( '.single-wps-product .wps-product .base-price' ).val() );
-
-		if ( jQuery( this ).hasClass( 'wps-quantity-minus' ) ) {
-			if ( qty > 1 ) {
-				qty--;
-			}
+	qty = parseInt( jQuery( '.single-wps-product .wps-product .wps-product-quantity .qty' ).text() );
+	var price = parseFloat( jQuery( '.single-wps-product .wps-product .base-price' ).val() );
+	if ( jQuery( this ).hasClass( 'wps-quantity-minus' ) ) {
+		if ( qty > 1 ) {
+			qty--;
 		}
-
-		if ( jQuery( this ).hasClass( 'wps-quantity-plus' ) ) {
-			qty++;
-		}
-
-		price *= qty;
-
-		price = new Intl.NumberFormat( 'fr-FR', { style: 'currency', currency: 'EUR' }).format(price);
-
-		jQuery( '.single-wps-product .wps-product' ).find( '.qty' ).text( qty );
-		jQuery( '.single-wps-product .wps-product .wps-product-buy' ).attr( 'data-qty', qty );
-		jQuery( '.single-wps-product .wps-product .wps-product-price' ).text( price );
 	}
+
+	if ( jQuery( this ).hasClass( 'wps-quantity-plus' ) ) {
+		qty++;
+	}
+
+	price *= qty;
+
+	price = new Intl.NumberFormat( 'fr-FR', { style: 'currency', currency: 'EUR' }).format(price);
+
+	jQuery( '.single-wps-product .wps-product' ).find( '.qty' ).text( qty );
+
+	if ( jQuery( '.single-wps-product .wps-product .wps-product-buy' ).length > 0 ) {
+		jQuery( '.single-wps-product .wps-product .wps-product-buy' ).attr( 'data-qty', qty );
+	}
+	jQuery( '.single-wps-product .wps-product .wps-product-price' ).text( price );
 }

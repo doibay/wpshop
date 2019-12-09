@@ -27,8 +27,8 @@ class PayPal_Action {
 	 * @since 2.0.0
 	 */
 	public function __construct() {
-		add_action( 'wps_setting_payment_method_paypal', array( $this, 'callback_setting_payment_method' ), 10, 0 );
-		add_action( 'admin_post_wps_update_method_payment_paypal', array( $this, 'update_method_payment_paypal' ) );
+		add_action( 'wps_setting_payment_method_paypal_after_form', array( $this, 'callback_setting_payment_method' ), 10, 0 );
+		add_action( 'wps_update_payment_method_data', array( $this, 'update_method_payment_paypal' ), 10, 2 );
 
 		add_action( 'wps_gateway_paypal', array( $this, 'callback_wps_gateway_paypal' ) );
 		add_action( 'wps_valid_paypal_standard_ipn_request', array( $this, 'callback_wps_valid_paypal_standard_ipn_request' ) );
@@ -51,32 +51,16 @@ class PayPal_Action {
 	 *
 	 * @since 2.0.0
 	 */
-	public function update_method_payment_paypal() {
-		check_admin_referer( 'update_method_payment_paypal' );
+	public function update_method_payment_paypal( $data, $type ) {
+		if ( 'paypal' === $type ) {
+			$paypal_email       = ! empty( $_POST['paypal_email'] ) ? sanitize_text_field( $_POST['paypal_email'] ) : '';
+			$use_paypal_sandbox = ( isset( $_POST['use_paypal_sandbox'] ) && 'on' === $_POST['use_paypal_sandbox'] ) ? true : false;
 
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die();
+			$data['paypal']['paypal_email']       = $paypal_email;
+			$data['paypal']['use_paypal_sandbox'] = $use_paypal_sandbox;
 		}
 
-		$title              = ! empty( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : '';
-		$active             = ( ! empty( $_POST['activate'] ) && 'true' == $_POST['activate'] ) ? true : false;
-		$description        = ! empty( $_POST['description'] ) ? sanitize_text_field( $_POST['description'] ) : '';
-		$paypal_email       = ! empty( $_POST['paypal_email'] ) ? sanitize_text_field( $_POST['paypal_email'] ) : '';
-		$use_paypal_sandbox = ( isset( $_POST['use_paypal_sandbox'] ) && 'on' === $_POST['use_paypal_sandbox'] ) ? true : false;
-
-		$payment_methods_option = get_option( 'wps_payment_methods', Payment::g()->default_options );
-
-		$payment_methods_option['paypal']['title']              = $title;
-		$payment_methods_option['paypal']['active']             = $active;
-		$payment_methods_option['paypal']['description']        = $description;
-		$payment_methods_option['paypal']['paypal_email']       = $paypal_email;
-		$payment_methods_option['paypal']['use_paypal_sandbox'] = $use_paypal_sandbox;
-
-		update_option( 'wps_payment_methods', $payment_methods_option );
-
-		set_transient( 'updated_wpshop_option_' . get_current_user_id(), __( 'Your settings have been saved.', 'wpshop' ), 30 );
-
-		wp_redirect( admin_url( 'admin.php?page=wps-settings&tab=payment_method&section=paypal' ) );
+		return $data;
 	}
 
 	/**

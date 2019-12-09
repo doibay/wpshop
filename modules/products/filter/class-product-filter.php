@@ -136,7 +136,7 @@ class Product_Filter {
 			$shipping_cost_option = get_option( 'wps_shipping_cost', Settings::g()->shipping_cost_default_settings );
 			$page_ids_options     = get_option( 'wps_page_ids', Pages::g()->default_options );
 
-			if ( $post->ID === $page_ids_options['shop_id'] ) {
+			if ( is_object( $post ) && $post->ID === $page_ids_options['shop_id'] ) {
 				$args = array(
 					'post_type' => 'wps-product',
 					'paged'     => get_query_var('paged') ? get_query_var('paged') : 1,
@@ -187,6 +187,10 @@ class Product_Filter {
 		}
 
 		return $content;
+	}
+
+	public function change_product_category_title( $title ) {
+		return 'yo';
 	}
 
 	/**

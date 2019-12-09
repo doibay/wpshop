@@ -33,6 +33,10 @@ class Core_Filter {
 		add_filter( 'parent_file', array( $this, 'highlight_menu' ) );
 
 		add_filter( 'set-screen-option', array( $this, 'save_per_page' ), 10, 3 );
+
+		add_filter( 'plugin_action_links_wpshop/wpshop.php', array( $this, 'add_link_plugin_page' ) );
+
+		add_filter( 'http_request_timeout', array( $this, 'extend_timeout_request' ) );
 	}
 
 	/**
@@ -117,6 +121,19 @@ class Core_Filter {
 
 		return $status;
 	}
+
+	public function add_link_plugin_page( $links ) {
+		$links[] = '<a href="' . admin_url( 'admin.php?page=wps-settings' ) . '">' .  __( 'Settings', 'wpshop' ) . '</a>';
+		$links[] = '<a href="' . admin_url( 'admin.php?page=wps-tools' ) . '">' .  __( 'Tools', 'wpshop' ) . '</a>';
+
+		return $links;
+	}
+
+	public function extend_timeout_request( $timeout ) {
+		// $timeout = 50;
+		return $timeout;
+	}
+
 }
 
 new Core_Filter();

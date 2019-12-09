@@ -40,10 +40,10 @@ class Pages_Filter extends \eoxia\Singleton_Util {
 	 * @since 2.0.0
 	 */
 	public function check_checkout_page() {
-
+		global $wp;
 		$page_ids_options = get_option( 'wps_page_ids', Pages::g()->default_options );
 
-		if ( $page_ids_options['checkout_id'] && is_page( $page_ids_options['checkout_id'] ) ) {
+		if ( $page_ids_options['checkout_id'] && is_page( $page_ids_options['checkout_id'] ) && ! in_array( 'received', $wp->query_vars ) ) {
 			$cart_contents = Cart_Session::g()->cart_contents;
 
 			if ( empty( $cart_contents ) ) {
@@ -55,8 +55,6 @@ class Pages_Filter extends \eoxia\Singleton_Util {
 
 	/**
 	 * Affiches le status des pages lié à WPshop.
-	 *
-	 * @todo: A vérifier
 	 *
 	 * @since 2.0.0
 	 *
@@ -90,46 +88,43 @@ class Pages_Filter extends \eoxia\Singleton_Util {
 		if ( ! is_admin() ) {
 			$page_ids_options = get_option( 'wps_page_ids', Pages::g()->default_options );
 
-			$key = array_search( $GLOBALS['post']->ID, $page_ids_options, true );
+			if ( isset( $GLOBALS['post'] ) && is_object( $GLOBALS['post'] ) ) {
+				$key = array_search( $GLOBALS['post']->ID, $page_ids_options, true );
 
-			$shortcode = '';
-			$params    = array();
+				$shortcode = '';
+				$params    = array();
 
-			if ( false !== $key ) {
-				switch ( $key ) {
-					case 'checkout_id':
-						$params['step'] = isset( $_GET['step'] ) ? $_GET['step'] : 1;
-						$shortcode      = 'checkout';
-						break;
-					case 'valid_page_id':
-						$shortcode      = 'valid';
-						$params['id']   = (int) get_query_var( 'id' );
-						$params['type'] = sanitize_text_field( get_query_var( 'type' ) );
-						break;
-					case 'cart_id':
-						$shortcode = 'cart';
-						break;
-					case 'my_account_id':
-						$shortcode = 'account';
-						break;
-					default:
-						break;
-				}
-			}
-
-			$tmp_content = $content;
-
-			if ( ! empty( $shortcode ) ) {
-				$shortcode_attr = '';
-				if ( ! empty( $params ) ) {
-					foreach ( $params as $key => $value ) {
-						$shortcode_attr .= $key . '=' . $value . ' ';
+				if ( false !== $key ) {
+					switch ( $key ) {
+						case 'checkout_id':
+							$params['step'] = isset( $_GET['step'] ) ? (int) $_GET['step'] : 1;
+							$shortcode      = 'checkout';
+							break;
+						case 'cart_id':
+							$shortcode = 'cart';
+							break;
+						case 'my_account_id':
+							$shortcode = 'account';
+							break;
+						default:
+							break;
 					}
 				}
-				ob_start();
-				do_shortcode( '[wps_' . $shortcode . ' ' . $shortcode_attr . ']' );
-				$content  = ob_get_clean();
-				$content .= $tmp_content;
+
+				$tmp_content = $content;
+
+				if ( ! empty( $shortcode ) ) {
+					$shortcode_attr = '';
+					if ( ! empty( $params ) ) {
+						foreach ( $params as $key => $value ) {
+							$shortcode_attr .= $key . '=' . $value . ' ';
+						}
+					}
+					ob_start();
+					do_shortcode( '[wps_' . $shortcode . ' ' . $shortcode_attr . ']' );
+					$content  = ob_get_clean();
+					$content .= $tmp_content;
+				}
 			}
 		}
 

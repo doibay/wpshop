@@ -20,7 +20,7 @@ window.eoxiaJS.wpshop.product.event = function() {
 	jQuery( document ).on( 'click', '.button-apply', window.eoxiaJS.wpshop.product.apply );
 	jQuery( '.similar-product' ).select2({
 		ajax: {
-			url: 'http://127.0.0.1/sd_shop/wp-json/wpshop/v2/product/search',
+			url: scriptParams.url + '/wp-json/wpshop/v2/product/search',
 			data: function (params) {
 				var query = {
 					s: params.term,

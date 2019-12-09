@@ -35,8 +35,6 @@ class Doli_Sync_Filter extends \eoxia\Singleton_Util {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @todo: A vérifier.
-	 *
 	 * @param  array $countries Les pays venant de WPshop.
 	 *
 	 * @return array            Les pays modifié de WPshop avec les données de
